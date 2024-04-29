@@ -1,17 +1,34 @@
 import 'package:comarcasgui/models/comarca.dart';
 import 'package:comarcasgui/repository/repository_exemple.dart';
+import 'package:comarcasgui/screens/infocomarca_navigator.dart';
 import 'package:flutter/material.dart';
 
 class ComarquesScreen extends StatelessWidget {
-  const ComarquesScreen({super.key});
+  // ComarquesScreen necessita un nom de provincia
+  // TO-DO:
+  // Afegir un argument amb nom al constructor amb el nom de la provincia
+  // Afegir també una propietat a la classe de tipus "final String" a la classe pe a la provincia
+  // const ComarquesScreen();
+
+  final String? nombre;
+
+  const ComarquesScreen({super.key, required this.nombre});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // TO-DO:
+      // Incorporar un AppBar per a que mostre el text
+      // "Comarques de..." i el nom de la província seleccionada.
+      appBar: AppBar(
+          title: Text('Comarques de $nombre')),
       body: Center(
-          // Proporciona a _creaLlistaComarques la llista de comarques d'Alacant
-          child:
-              _creaLlistaComarques(RepositoryExemple.obtenirComarques())), ////
+        // TO-DO:
+        // Crear la llista de comarques amb les comarques 
+        // corresponents a la província actual (passar en lloc d'alacant
+        // la propietat amb el nom de la província que heu declarat
+          child:  
+            _creaLlistaComarques(RepositoryExemple.obtenirComarques(nombre!))), ////
     );
   }
 
@@ -43,7 +60,7 @@ class ComarquesScreen extends StatelessWidget {
 class ComarcaCard extends StatelessWidget {
   // Aquest giny rebrà dos arguments amb nom per construir-se:
   // la imatge (img) i el nom de la comarca (comarca)
-  const ComarcaCard({
+  ComarcaCard({
     super.key,
     required this.img,
     required this.comarca,
@@ -52,24 +69,40 @@ class ComarcaCard extends StatelessWidget {
   final String img;
   final String comarca;
 
+  final TextEditingController _controlador = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    // Retorna un giny de tipus Card, amb el disseny que desitgeu, però
-    // que mostre la imatge (obtinguda d'Internet a partir de la url)
-    // i el nom de la comarca.
-    return Card(
-      elevation: 1,
-      child: Column(children: [
-      Stack(children: [
-        Image.network(img, width: 400, height: 200,fit: BoxFit.fill),
-        Positioned(
-          bottom: 10,
-          left: 80,
-          child: Text(comarca,style: Theme.of(context).textTheme.displayMedium),
-        ),
-      ]),],
-    ),
-    );
+    // TO-DO:
+    // Envoltar aquest Card amb un GestureDetector, de manera
+    // que quan fem clic en ell, (event onTap), "naveguem" fins la pantalla
+    // amb la informació sobre la comarca seleccionada.
+    // Aquesta nova pantalla serà InfoComarca (fitxer infocomarca.dart),
+    // que haureu d'implementar.
+    
+    Comarca? comarques = RepositoryExemple.obtenirInfoComarca(comarca);
+
+    return GestureDetector(
+      onTap: () {
+        _controlador.text = comarca;  
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => 
+            InfoComarcaNavigator(nomcomarca: _controlador.text, comarca: comarques)),
+        );
+      }, 
+      child: Card(
+        elevation: 1,
+        child: Column(children: [
+        Stack(children: [
+          Image.network(img, width: 400, height: 200,fit: BoxFit.fill),
+          Positioned(
+            bottom: 10,
+            left: 80,
+            child: Text(comarca,style: Theme.of(context).textTheme.displayMedium),
+          ),
+        ]),],
+      ),
+      ),);
     //return const Placeholder();
   }
 }

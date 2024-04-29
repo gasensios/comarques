@@ -3,6 +3,7 @@ import 'package:comarcasgui/screens/infocomarca_detall.dart';
 import 'package:comarcasgui/screens/infocomarca_general.dart';
 import 'package:comarcasgui/screens/provincies_screen.dart';
 import 'package:flutter/material.dart';
+//import 'package:comarcasgui/models/comarca.dart';
 
 class LauncherScreen extends StatelessWidget {
   const LauncherScreen({
@@ -30,7 +31,7 @@ class LauncherScreen extends StatelessWidget {
                 Navigator.push<void>(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (BuildContext context) => const ComarquesScreen(),
+                    builder: (BuildContext context) => const ComarquesScreen(nombre: '',),
                   ),
                 );
               },
@@ -41,7 +42,7 @@ class LauncherScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) =>
-                        const InfoComarcaGeneral(),
+                        const InfoComarcaGeneral(nomcomarca: '',comarca: null,),
                   ),
                 );
               },
@@ -53,7 +54,7 @@ class LauncherScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) =>
-                        const InfoComarcaDetall(),
+                        const InfoComarcaDetall(nomcomarca: '', comarca: null),
                   ),
                 );
               },
