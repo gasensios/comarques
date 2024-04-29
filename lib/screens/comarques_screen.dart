@@ -1,66 +1,72 @@
-import 'package:comarcasgui/models/comarca.dart';
-import 'package:comarcasgui/repository/repository_exemple.dart';
 import 'package:comarcasgui/screens/infocomarca_navigator.dart';
+import 'package:comarcasgui/services/comarques_service.dart';
 import 'package:flutter/material.dart';
 
 class ComarquesScreen extends StatelessWidget {
-  // ComarquesScreen necessita un nom de provincia
-  // TO-DO:
-  // Afegir un argument amb nom al constructor amb el nom de la provincia
-  // Afegir també una propietat a la classe de tipus "final String" a la classe pe a la provincia
-  // const ComarquesScreen();
-
-  final String? nombre;
-
-  const ComarquesScreen({super.key, required this.nombre});
+  const ComarquesScreen({super.key, required this.provincia});
+  final String? provincia;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // TO-DO:
-      // Incorporar un AppBar per a que mostre el text
-      // "Comarques de..." i el nom de la província seleccionada.
       appBar: AppBar(
-          title: Text('Comarques de $nombre')),
+          title: Text('Comarques de $provincia')),
       body: Center(
-        // TO-DO:
-        // Crear la llista de comarques amb les comarques 
-        // corresponents a la província actual (passar en lloc d'alacant
-        // la propietat amb el nom de la província que heu declarat
-          child:  
-            _creaLlistaComarques(RepositoryExemple.obtenirComarques(nombre!))), ////
-    );
+          // Eliminada: Ja no tenim RepositoryExample
+          // child: _creaLlistaComarques(RepositoryExemple.obtenirComarques(provincia))
+
+          // TO-DO 4: Afig un giny FutureBuilder, que depenga del
+          // Future proporcionat pel mètode d'obteció de comarques
+          // del repositori corresponent. Quan es dispose
+          // d'aquesta informació es crearà la llista de comarques,
+          // i mentre aquesta no es tinga, mostrarem un indicador de progrés.
+          // child: _creaLlistaComarques([]), // Modificar
+          child: FutureBuilder(
+            future: ComarquesService.obtenirComarques(provincia!),
+            builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return _creaLlistaComarques(snapshot.data!); 
+                } else if (snapshot.hasError) {
+                        return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  // Nota: Podeu crear un giny personalitzat
+                  // amb aquest contingut, per tindre un
+                  // indicador de progrés personalitzat amb
+                  // les dimensions correctes i centrat, 
+                  // que pugueu reutilitzar en les altres pantalles.
+                  return const Center(
+                    child: SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: CircularProgressIndicator()),
+                  );
+                }
+              }),
+    ));
   }
 
-  _creaLlistaComarques(List<dynamic> comarques) {
-    // Rebem la llista de JSON amb el nom i la imatge (img) de cada comarca
-
-    List<dynamic> llistaComarques = [];
-    
-      for (var comarca in comarques) {
-        llistaComarques.add(Comarca(
-            comarca: comarca["nom"],
-            img: comarca["img"],
-        ));
-      }
-    
-    // Ús de ListView.builder per generar la llista
+_creaLlistaComarques(List<dynamic> comarques) {
     return ListView.builder(
       itemCount: comarques.length,
       itemBuilder: (BuildContext context, int index) {
-        return ComarcaCard(comarca: comarques[index]['nom'], img: comarques[index]['img'] ?? "");
-      }
+        if (comarques.isNotEmpty) {
+          String img = comarques[index]["img"];
+          String comarca = comarques[index]["nom"];
+          return ComarcaCard(img: img, comarca: comarca);
+        } else {
+          return const Center(
+            child: Text("La llista és buida"),
+          );
+        }
+      },
     );
-    // Caldrà fer ús d'un ListView.builder per recórrer la llista
-    // i generar un giny personalitzat de tipus ComarcaCard, amb la imatge i el nom.
-    //return const Placeholder();
   }
 }
 
 class ComarcaCard extends StatelessWidget {
-  // Aquest giny rebrà dos arguments amb nom per construir-se:
-  // la imatge (img) i el nom de la comarca (comarca)
-  ComarcaCard({
+  const ComarcaCard({
     super.key,
     required this.img,
     required this.comarca,
@@ -69,40 +75,44 @@ class ComarcaCard extends StatelessWidget {
   final String img;
   final String comarca;
 
-  final TextEditingController _controlador = TextEditingController();
-
+  // Ara RepositoryExample ja no existeix // comarca = RepositoryExemple.obtenirInfoComarca(widget.nomComarca);
+  // TO-DO 5a: Obtenir la informació de la comarca
+  //           a través del repositori corresponent.
   @override
   Widget build(BuildContext context) {
-    // TO-DO:
-    // Envoltar aquest Card amb un GestureDetector, de manera
-    // que quan fem clic en ell, (event onTap), "naveguem" fins la pantalla
-    // amb la informació sobre la comarca seleccionada.
-    // Aquesta nova pantalla serà InfoComarca (fitxer infocomarca.dart),
-    // que haureu d'implementar.
-    
-    Comarca? comarques = RepositoryExemple.obtenirInfoComarca(comarca);
 
     return GestureDetector(
       onTap: () {
-        _controlador.text = comarca;  
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => 
-            InfoComarcaNavigator(nomcomarca: _controlador.text, comarca: comarques)),
-        );
-      }, 
-      child: Card(
-        elevation: 1,
-        child: Column(children: [
-        Stack(children: [
-          Image.network(img, width: 400, height: 200,fit: BoxFit.fill),
-          Positioned(
-            bottom: 10,
-            left: 80,
-            child: Text(comarca,style: Theme.of(context).textTheme.displayMedium),
+        Navigator.push<void>(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => InfoComarcaNavigator(
+              nomcomarca: comarca
+            ),
           ),
-        ]),],
+        );
+      },
+      child: Card(
+        child: Container(
+            height: 150,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.blue,
+              image:
+                  DecorationImage(image: NetworkImage(img), fit: BoxFit.cover),
+            ),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(comarca,style: const TextStyle(
+                fontFamily: "LeckerliOne",
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 20,
+                shadows: [
+                  Shadow(offset: Offset(2, 2),color: Colors.black,blurRadius: 3),
+                ]),
+              ),
+            )),
       ),
-      ),);
-    //return const Placeholder();
+    );
   }
 }

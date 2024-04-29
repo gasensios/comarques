@@ -3,52 +3,79 @@ import 'package:comarcasgui/screens/widgets/my_weather_info.dart';
 import 'package:flutter/material.dart';
 
 class InfoComarcaDetall extends StatelessWidget {
-  
-  // TO-DO
-  // Afegir la propietat comarca, de tipus Comarca? i proporcionar-la
-  // al constructor com a argument amb nom.
-
-  final String? nomcomarca;
-  final Comarca? comarca;
 
   const InfoComarcaDetall({
     super.key,
     required this.nomcomarca,
     required this.comarca
   });
+  final String? nomcomarca;
+  final Comarca? comarca;
 
   @override
   Widget build(BuildContext context) {
-    // TO-DO
-    // Ja tenim aquesta informació en la propietat Comarca, 
-    //proporcionada om a argument, pel que haurem d'eliminar esta línia.
-    
-    // Compte que ara comarca pot ser nul, pel que haurem de fer ús
-    // posteriormen de l'accés amb nuls ?. i de l'operador ?? per 
-    // assignar valors en cas que siguen nuls.
-    
-    // TO-DO
-    // Com que tenim l'Scaffold en InfoComarca i aquest és
-    // un giny que serà part del seu body, haurem d'eliminar
-    // aquest Scaffold
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column ( children: <Widget> [
-          const MyWeatherInfo(),
-            // TO-DO
-            // Què passa si comarca és null?
-            Text('\nPoblacio: ${comarca?.poblacio ?? 'No disponible'} \n', style: const TextStyle(fontSize: 22, color: Colors.black)),
-            // TO-DO
-            // Què passa si latitud és null?
-            Text('Latitud: ${comarca!.latitud ?? 'No disponible'} \n', style: const TextStyle(fontSize: 22, color: Colors.black)),
-            // TO-DO
-            // Què passa si longitud és null?
-            Text('Longitud: ${comarca!.longitud ?? 'No disponible'} \n', style: const TextStyle(fontSize: 22, color: Colors.black)),
-        ],  
-        ),
+    return SingleChildScrollView(
+      child: Container(
+        margin: const EdgeInsets.all(16.0),
+        decoration:
+            const BoxDecoration(color: Color.fromARGB(200, 255, 255, 255)),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 80),
+              // TO-DO?
+              // Ara cal parametritzar el giny MyWeatherInfo
+              MyWeatherInfo(longitud: comarca?.longitud,latitud: comarca?.latitud,),
+              const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(width: 150,child: Text("Població:",
+                                  style: Theme.of(context).textTheme.headlineSmall,
+                                ),
+                              ),
+                              Text(comarca?.poblacio?.toString() ?? "0",
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                  width: 150,
+                                  child: Text("Latitud:",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  )),
+                              Text(
+                                comarca?.latitud?.toString() ?? "",
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    "Longitud:",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  )),
+                              Text(
+                                comarca?.longitud?.toString() ?? "",
+                                style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ), //////
+            ]),
       ),
     );
-    //return const Placeholder();
   }
 }
